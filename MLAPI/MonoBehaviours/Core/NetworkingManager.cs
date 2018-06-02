@@ -829,6 +829,7 @@ namespace MLAPI.MonoBehaviours.Core
             }
         }
 
+        internal uint? replyId = null;
         private void HandleIncomingData(uint clientId, byte[] data, int channelId, uint totalSize)
         {
             if (LogHelper.CurrentLogLevel <= LogLevel.Developer) LogHelper.LogInfo("Unwrapping Data Header");
@@ -852,6 +853,10 @@ namespace MLAPI.MonoBehaviours.Core
                     passthroughTarget = reader.ReadUInt();
                 else if (isPassthrough && !isServer)
                     passthroughOrigin = reader.ReadUInt();
+
+                bool isReply = reader.ReadBool();
+                if (isReply) replyId = reader.ReadUInt();
+                else replyId = null;
 
                 long headerBitSize = BitWriter.GetBitCount(messageType) + BitWriter.GetBitCount(targeted);
                 if (targeted) headerBitSize += BitWriter.GetBitCount(targetNetworkId) + BitWriter.GetBitCount(networkOrderId);
@@ -1050,6 +1055,7 @@ namespace MLAPI.MonoBehaviours.Core
                         #endregion
                     }
                 }
+                replyId = null; // This is to prevent a reply after the invokes have returned
                 NetworkProfiler.EndEvent();
             }
         }

@@ -19,7 +19,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
 
             using (BitWriter writer = BitWriter.Get())
             {
-                writer.WriteGenericMessageHeader(messageType, networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), true, null, sourceId);
+                writer.WriteGenericMessageHeader(messageType, networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), true, null, sourceId, false, 0);
 
 #if !DISABLE_CRYPTOGRAPHY
                 if (netManager.NetworkConfig.EncryptedChannelsHashSet.Contains(MessageManager.reverseChannels[channelId]))
@@ -36,7 +36,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
         }
 
         //RETURNS IF IT SUCCEDED OR FAILED BECAUSE OF NON-OBSERVER. ANY OTHER FAIL WILL RETURN TRUE
-        internal static bool Send(uint clientId, string messageType, string channelName, BitWriter messageWriter, uint? fromNetId, uint? networkId = null, ushort? orderId = null, bool skipQueue = false)
+        internal static bool Send(uint clientId, string messageType, string channelName, BitWriter messageWriter, uint? fromNetId, uint? networkId = null, ushort? orderId = null, uint? replyId = null, bool skipQueue = false)
         {
             uint targetClientId = clientId;
             if (netManager.isHost && targetClientId == netManager.NetworkConfig.NetworkTransport.HostDummyId)
@@ -62,7 +62,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
 
             using (BitWriter writer = BitWriter.Get())
             {
-                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), isPassthrough, clientId, null);
+                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), isPassthrough, clientId, null, replyId != null, replyId.GetValueOrDefault());
 
 #if !DISABLE_CRYPTOGRAPHY
                 if (netManager.NetworkConfig.EncryptedChannelsHashSet.Contains(channelName))
@@ -97,7 +97,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
             }
         }
 
-        internal static void Send(uint[] clientIds, string messageType, string channelName, BitWriter messageWriter, uint? fromNetId, uint? networkId = null, ushort? orderId = null)
+        internal static void Send(uint[] clientIds, string messageType, string channelName, BitWriter messageWriter, uint? fromNetId, uint? networkId = null, ushort? orderId = null, uint? replyId = null)
         {
             if (netManager.NetworkConfig.EncryptedChannelsHashSet.Contains(channelName))
             {
@@ -107,7 +107,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
 
             using (BitWriter writer = BitWriter.Get())
             {
-                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), false, 0, 0);
+                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), false, 0, 0, replyId != null, replyId.GetValueOrDefault());
 
                 writer.WriteWriter(messageWriter);
 
@@ -140,7 +140,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
             }
         }
 
-        internal static void Send(List<uint> clientIds, string messageType, string channelName, BitWriter messageWriter, uint? fromNetId, uint? networkId = null, ushort? orderId = null)
+        internal static void Send(List<uint> clientIds, string messageType, string channelName, BitWriter messageWriter, uint? fromNetId, uint? networkId = null, ushort? orderId = null, uint? replyId = null)
         {
             if (netManager.NetworkConfig.EncryptedChannelsHashSet.Contains(channelName))
             {
@@ -150,7 +150,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
 
             using (BitWriter writer = BitWriter.Get())
             {
-                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), false, 0, 0);
+                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), false, 0, 0, replyId != null, replyId.GetValueOrDefault());
 
                 writer.WriteWriter(messageWriter);
 
@@ -185,7 +185,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
 
         private static List<uint> failedObservers = new List<uint>();
         //RETURNS THE CLIENTIDS WHICH WAS NOT BEING OBSERVED
-        internal static ref List<uint> Send(string messageType, string channelName, BitWriter messageWriter, uint? fromNetId,  uint? networkId = null, ushort? orderId = null)
+        internal static ref List<uint> Send(string messageType, string channelName, BitWriter messageWriter, uint? fromNetId,  uint? networkId = null, ushort? orderId = null, uint? replyId = null)
         {
             failedObservers.Clear();
             if (netManager.connectedClients.Count == 0)
@@ -198,7 +198,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
 
             using (BitWriter writer = BitWriter.Get())
             {
-                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), false, 0, 0);
+                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), false, 0, 0, replyId != null, replyId.GetValueOrDefault());
 
                 writer.WriteWriter(messageWriter);
 
@@ -236,7 +236,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
         }
 
         //RETURNS THE CLIENTIDS WHICH WAS NOT BEING OBSERVED
-        internal static ref List<uint> Send(string messageType, string channelName, BitWriter messageWriter, uint clientIdToIgnore, uint? fromNetId, uint? networkId = null, ushort? orderId = null)
+        internal static ref List<uint> Send(string messageType, string channelName, BitWriter messageWriter, uint clientIdToIgnore, uint? fromNetId, uint? networkId = null, ushort? orderId = null, uint? replyId = null)
         {
             failedObservers.Clear();
             if (netManager.NetworkConfig.EncryptedChannels.Contains(channelName))
@@ -247,7 +247,7 @@ namespace MLAPI.NetworkingManagerComponents.Core
 
             using (BitWriter writer = BitWriter.Get())
             {
-                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), false, 0, 0);
+                writer.WriteGenericMessageHeader(MessageManager.messageTypes[messageType], networkId != null, networkId.GetValueOrDefault(), orderId.GetValueOrDefault(), false, 0, 0, replyId != null, replyId.GetValueOrDefault());
 
                 writer.WriteWriter(messageWriter);
 
@@ -287,21 +287,30 @@ namespace MLAPI.NetworkingManagerComponents.Core
             }
         }
 
-        private static void WriteGenericMessageHeader(this BitWriter writer, ushort messageType, bool isTargeted, uint targetNetworkId, ushort behaviourIndex, bool isPassthrough, uint? passthroughTarget, uint? passthroughOrigin)
+        private static void WriteGenericMessageHeader(this BitWriter writer, ushort messageType, 
+            bool isTargeted, uint targetNetworkId, ushort behaviourIndex, 
+            bool isPassthrough, uint? passthroughTarget, uint? passthroughOrigin,
+            bool isReply, uint replyId)
         {
             writer.WriteUShort(messageType);
+
             writer.WriteBool(isTargeted);
             if (isTargeted)
             {
                 writer.WriteUInt(targetNetworkId);
                 writer.WriteUShort(behaviourIndex);
             }
+
             writer.WriteBool(isPassthrough);
             if (isPassthrough)
             {
                 if (passthroughTarget != null) writer.WriteUInt(passthroughTarget.Value);
                 if (passthroughOrigin != null) writer.WriteUInt(passthroughOrigin.Value);
             }
+
+            writer.WriteBool(isReply);
+            if (isReply) writer.WriteUInt(replyId);
+
             writer.WriteAlignBits();
         }
     }

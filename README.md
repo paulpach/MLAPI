@@ -2,6 +2,7 @@
 
 MLAPI (Mid level API) is a framework that hopefully simplifies building networked games in Unity. It is built on the LLAPI and is similar to the HLAPI in many ways. It does not however integrate into the compiler and it's meant to offer much greater flexibility than the HLAPI while keeping some of it's simplicity. It offers greater performance over the HLAPI.
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/faadd2a137104528923aae3e69fc60f8)](https://app.codacy.com/app/paulpach/MLAPI?utm_source=github.com&utm_medium=referral&utm_content=paulpach/MLAPI&utm_campaign=badger)
 [![Github All Releases](https://img.shields.io/github/downloads/MidLevel/MLAPI/total.svg)](https://github.com/MidLevel/MLAPI/releases)
 [![GitHub Release](https://img.shields.io/github/release/MidLevel/MLAPI.svg)](https://github.com/MidLevel/MLAPI/releases)
 [![Build status](https://ci.appveyor.com/api/projects/status/isxpxba8r76x7chu/branch/master?svg=true)](https://ci.appveyor.com/project/MidLevel/mlapi/branch/master)
